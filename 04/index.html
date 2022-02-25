@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html ng-app="listaTelefonica"> <!-- sempre declara num nível maior -->
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="lib/bootstrap/bootstrap.min.css">
+		<title>Lista Telefônica</title>
+		<style type="text/css">
+			.card { background: #ccc !important; }
+			.selecionado { background: #c1c1c1; }
+		</style>
+		<script src="lib/angular/angular.js"></script>
+		<script src="lib/angular/angular-messages.js"></script>
+		<script>
+			angular.module("listaTelefonica", ["ngMessages"]);
+			angular.module("listaTelefonica").controller("listaTelefonicaController", function ($scope) {
+				$scope.app = "Lista Telefônica";
+				$scope.contatos = [
+					{ nome: "Pedro", telefone: "999999999", cor: "blue" },
+					{ nome: "Ana",   telefone: "999999997", cor: "yellow" },
+					{ nome: "Maria", telefone: "999999998", cor: "green" }
+				];
+				$scope.operadoras = [
+					{ nome: "Oi", codigo: 31, categoria: "Celular" },
+					{ nome: "Vivo", codigo: 15, categoria: "Celular" },
+					{ nome: "Tim", codigo: 41, categoria: "Celular" },
+					{ nome: "Claro", codigo: 21, categoria: "Celular" },
+					{ nome: "GVT", codigo: 25, categoria: "Fixo" },
+					{ nome: "Embratel", codigo: 21, categoria: "Fixo" }
+				];
+				$scope.adicionarContato = function (contato) {
+					// $scope.contatos.push(angular.copy(contato));
+					$scope.contatos.push(contato);
+					delete $scope.contato;
+					$scope.contatoForm.$setPristine();
+				};
+				$scope.apagarContatos = function(contatos) {
+					$scope.contatos = contatos.filter(function(contato) {
+						if(!contato.selecionado) return contato;
+					});
+				};
+				$scope.isContatoSelecionado = function(contatos) {
+					// Percorre o array de contatos, e retorna true se algum estiver selecionado
+					return contatos.some(function (contato) {
+						return contato.selecionado;
+					});
+				};
+			});
+		</script>
+	</head>
+	<body ng-controller="listaTelefonicaController">
+		<div class="card text-center w-50 m-auto p-4 mt-5 bg-success text-light">
+			<!-- <h4 ng-bind="app"></h4> -->
+			<h3>{{ app }}</h3>
+
+			<!-- {{ contatos }} -->
+			<table class="table mt-3" ng-show="contatos.length > 0">
+				<tr>
+					<th></th>
+					<th>Nome</th>
+					<th>Telefone</th>
+					<th>Operadora</th>
+					<th></th>
+				</tr>
+				<tr ng-repeat="contato in contatos" ng-class="{ 'selecionado fw-bold': contato.selecionado }">
+					<td><input type="checkbox" ng-model="contato.selecionado"></td>
+					<td>{{ contato.nome }}</td>
+					<td>{{ contato.telefone }}</td>
+					<td>{{ contato.operadora.nome }}</td>
+					<td><div style="display: block;width:20px; height:20px;" ng-style="{'background-color':contato.cor}"></div></td>
+				</tr>
+			</table>
+
+			<div ng-messages="contatoForm.nome.$error" ng-if="contatoForm.nome.$error" class="alert alert-danger p-0">
+				<div ng-message="required">
+					Por favor, preencha o campo nome!
+				</div>
+				<div ng-message="minlength">
+					O campo nome deve ter no mínimo 5 caracteres.
+				</div>
+				
+			</div>
+
+			<div class="alert alert-danger mt-2" ng-show="contatoForm.telefone.$error.required && contatoForm.telefone.$dirty">
+					Por favor, preencha o campo telefone!
+				</div>
+				<div class="alert alert-danger mt-2" ng-show="contatoForm.telefone.$error.pattern">
+					O campo telefone deve ter o formato 0000-0000
+				</div>
+
+			<form name="contatoForm">
+				<input class="form-control mt-2" type="text" name="nome" ng-model="contato.nome" placeholder="Nome" ng-required="true" ng-minlength="5">
+				<input class="form-control mt-2" type="text" name="telefone" ng-model="contato.telefone" placeholder="(XX) XXXXX-XXXX" ng-required="true" ng-pattern="/^\d{4,5}-\d{4}$/">
+				<select class="form-control mt-2" ng-model="contato.operadora" ng-options="operadora.nome group by operadora.categoria for operadora in operadoras">
+					<option value="">Selecione uma operadora</option>
+				</select>
+
+				<div class="d-grid gap-2 mt-2">
+					<button class="btn btn-primary" ng-click="adicionarContato(contato)" ng-disabled="contatoForm.$invalid">Adicionar Contato</button>
+					<button class="btn btn-danger" ng-disabled="!isContatoSelecionado(contatos)" ng-click="apagarContatos(contatos)">Apagar Contato</button>
+				</div>
+			</form>
+
+			
+
+		</div>
+		<div ng-include="'footer.html'"></div>
+	</body>
+</html>
+
+
+<!--
+
+	Diretivas são extensões do HTML:
+	ngApp			> elemento master
+	ngController	> controlador da aplicação
+	ngBind			> substitui um elemento por uma expressão
+	ngRepeat		> Iteração de itens
+	ngModel			> Inverso do ngBind (pega do scope pra view), ngModel define o scope (input, select, textarea)
+	ngClick			> Evento clique
+	ngDisable		> Desabilita elemento
+	ngOptions		> Renderiza as opções de um select
+	ngClass			> Aplicando classe dinamicamente
+	ngStyle			> Estilos dinamicamente
+	ngShow			> Apenas visual - display: block
+	ngHide			> Apenas dá um display: none, mantendo no DOM
+	ngIf			> Não aparece no DOM se a condição não for satisfeita
+	ngInclude		> Incluir conteúdo dinamicamente, layout, px
+	ngRequired
+	$valid
+	$invalid
+	$pristine		> Se o campo é "virgem", ainda não foi tocado
+	$dirty			> Se já foi tocado
+	ngMinlength
+	ngMaxLength
+	$error
+	ngPattern
+	ng-messages
+
+	$scope é a injeção de dependência que faz a ligação entre a view e o controller
+
+-->

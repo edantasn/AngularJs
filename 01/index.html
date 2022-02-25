@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html ng-app="helloWorld"> <!-- nome do módulo -->
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Hello World</title>
+		<script src="angular.js"></script>
+		<script>
+			// Cria um módulo
+			angular.module("helloWorld", []);
+
+			// Controller > $scope é injetado como dependência e é a porta de entrada pra view
+			angular.module("helloWorld").controller("helloWorldController", function ($scope) {
+				$scope.message = "Hello World!";
+			});
+		</script>
+	</head>
+	<body>
+		<div ng-controller="helloWorldController">
+			{{ message }}
+		</div>
+	</body>
+</html>
+
+<!--
+
+Diretivas são extensões do HTML:
+ngApp
+
+-->
